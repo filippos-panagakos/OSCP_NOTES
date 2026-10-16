@@ -15,7 +15,7 @@ We see there is a Forgot Password? link at the bottom of the login form. Clickin
 
 # **Sensitive Data Exposure (Information Disclosure)** combined with a **Broken Access Control** vulnerability.
 
-![[Pasted image 20261010142445.png]]
+![](../images/Pasted%20image%2020261010142445.png)
 
 
 # Foothold

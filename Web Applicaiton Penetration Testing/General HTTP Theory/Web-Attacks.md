@@ -21,15 +21,15 @@ a way to see what http verbs are allowed on a web server is to use curl with the
 
 
 Here we tried to create a test; file and it got rejected , if we change our request from a GET to a POST  the command executes 
-![[Pasted image 20260916142518.png]]
+![](../../images/Pasted%20image%2020260916142518.png)
 
-![[Pasted image 20260916142618.png]]
-
-
-![[Pasted image 20260916142640.png]]
+![](../../images/Pasted%20image%2020260916142618.png)
 
 
-![[Pasted image 20260916142647.png]]
+![](../../images/Pasted%20image%2020260916142640.png)
+
+
+![](../../images/Pasted%20image%2020260916142647.png)
 
 
 > [!KEEP IN MIND]
@@ -125,7 +125,7 @@ We see that the `preg_match` filter only checks for special characters in `POST`
 - By `comparing user roles`
 
 
-![[Pasted image 20260918140042.png]]
+![](../../images/Pasted%20image%2020260918140042.png)
 
 
 Here we were able to change the request from a POST to a GET use profile user 5 and manipulate the API call and get the information of user 5
@@ -133,7 +133,7 @@ Here we were able to change the request from a POST to a GET use profile user 5 
 
 Chaining IDOR # Vulnerabilities
 
-![[Pasted image 20260918144123.png]]
+![](../../images/Pasted%20image%2020260918144123.png)
 
 
 Here we could fuzz the api call $ with intruder , we specified a number from 1-20 to find out what different roles exist, we found at UID 10 a user with admin rights
@@ -154,7 +154,7 @@ ENTITY xxe
 
 and called the entity using the name "&xxe;"
 
-![[Pasted image 20260918204710.png]]
+![](../../images/Pasted%20image%2020260918204710.png)
 
 > [!NOTE]
 > In our example, the XML input in the HTTP request had no DTD being declared within the XML data itself, or being referenced externally, so we added a new DTD before defining our entity. If the `DOCTYPE` was already declared in the XML request, we would just add the `ENTITY` element to it.
@@ -163,4 +163,4 @@ and called the entity using the name "&xxe;"
 
 
 
-![[Pasted image 20260918214949.png]]
+![](../../images/Pasted%20image%2020260918214949.png)

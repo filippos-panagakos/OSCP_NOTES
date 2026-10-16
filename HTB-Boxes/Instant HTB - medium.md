@@ -38,7 +38,7 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6IkFkbWlu
 
 ```
 
-![[Pasted image 20261016114235.png]]
+![](../images/Pasted%20image%2020261016114235.png)
 
 registartion form is expecting post request including  a username , password and pin structure formated in json
 we add 
@@ -54,17 +54,17 @@ content-type: application/json
 
 }
 ```
-![[Pasted image 20261016120813.png]]
+![](../images/Pasted%20image%2020261016120813.png)
 
 account registered, now lets try to login
 
-![[Pasted image 20261016121927.png]]
+![](../images/Pasted%20image%2020261016121927.png)
 
 received a auth token
-![[Pasted image 20261016122013.png]]
+![](../images/Pasted%20image%2020261016122013.png)
 
 made an account
-![[Pasted image 20261016122234.png]]
+![](../images/Pasted%20image%2020261016122234.png)
 
 
 
@@ -160,7 +160,7 @@ python3 werkzeug_cracker.py -w /usr/share/wordlists/rockyou.txt -p //shirohigeha
 
 
 
-![[Pasted image 20261016150327.png]]
+![](../images/Pasted%20image%2020261016150327.png)
 
 
 ### Priv Esc
@@ -173,7 +173,7 @@ python3 werkzeug_cracker.py -w /usr/share/wordlists/rockyou.txt -p //shirohigeha
 > **Solar PuTTY** is a Windows SSH/Telnet client (by SolarWinds) — like PuTTY but with a nicer UI. Its killer feature is that it **saves sessions with stored credentials** — hostnames, usernames, passwords, and private keys — so you don’t have to type them every time.
 
 
-![[Screenshot_4.png]]
+![](../images/Screenshot_4.png)
 
 
 **OSCP takeaway:** Always check `/opt/`, `/backups/`, and home directories for session files, config backups, and credential stores — PuTTY sessions (`.ppk`, `sessions-backup.dat`), WinSCP configs, FileZilla `sitemanager.xml`, `.bash_history`, KeePass databases, etc. Admins love saving credentials for convenience, and those files are often left world-readable.

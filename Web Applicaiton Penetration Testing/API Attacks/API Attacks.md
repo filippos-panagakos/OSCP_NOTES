@@ -103,7 +103,7 @@ Because of these parameters, the tool will start at `0000` and iterate through e
 An other way to do this was to send the request to intruder and fuzz it but it would have taken much longer 
 
 
-![[Pasted image 20261003152713.png]]
+![](../../images/Pasted%20image%2020261003152713.png)
 
 ---------------
 
@@ -120,10 +120,10 @@ On the other hand, an API endpoint is vulnerable to `Mass Assignment` if it perm
 
 ## Exposure of Sensitive Information Due to Incompatible Policies
 
-![[Pasted image 20261003153602.png]]
+![](../../images/Pasted%20image%2020261003153602.png)
 
 
-![[Pasted image 20261003153612.png]]
+![](../../images/Pasted%20image%2020261003153612.png)
 
 
 ## Improperly Controlled Modification of Dynamically-Determined Object Attributes
@@ -231,7 +231,7 @@ And the server responds with:
 The front-end takes your input and inserts it into a URL that the server calls internally. If the server doesn't sanitize, you can inject your own parameters.
 
 
-![[Pasted image 20261005094557.png]]
+![](../../images/Pasted%20image%2020261005094557.png)
 
 ##  Attack Techniques
 

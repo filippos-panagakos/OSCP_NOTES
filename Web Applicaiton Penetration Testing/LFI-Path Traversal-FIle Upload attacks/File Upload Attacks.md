@@ -25,13 +25,13 @@ Weakest filter — runs entirely in the browser, so you fully control it.
 
 
 ```
-```![[Pasted image 20260912095649.png]]
+```![](../../images/Pasted%20image%2020260912095649.png)
 
 here we bypassed the restriction by modifying the on submit post request removing the validate() and leaving a plan upload()
 
-![[Pasted image 20260912115754.png]]
+![](../../images/Pasted%20image%2020260912115754.png)
 
-![[Pasted image 20260912115828.png]]
+![](../../images/Pasted%20image%2020260912115828.png)
 
 we can also do this with burp intercepting the post request , like follow
 
@@ -45,11 +45,11 @@ then we forward the request go to the destination upload dir and call the php fi
 
 
 
-![[Pasted image 20260912120527.png]]
+![](../../images/Pasted%20image%2020260912120527.png)
 
 and it worked 
 
-![[Pasted image 20260912120910.png]]
+![](../../images/Pasted%20image%2020260912120910.png)
 
 
 # # Blacklist Filters
@@ -63,7 +63,7 @@ As we might be able to bypass the file type , we might then face a problem with 
 First we upload the allowed image, we intercept the post request with burp, once we capture the request we send it to intruder(once mistake that i made was deleting the image meta data, in this case without that in the body it wasnt allowing the upload)
 
 
-![[Pasted image 20260912141631.png]]
+![](../../images/Pasted%20image%2020260912141631.png)
 
 we changed the filename from images.jpg to shell.php, we highlighed the .php and used 
 
@@ -73,11 +73,11 @@ or we could also use this list as well
 
 https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Upload%20Insecure%20Files/Extension%20PHP/extensions.lst
 
-![[Pasted image 20260912141653.png]]
+![](../../images/Pasted%20image%2020260912141653.png)
 
 After the file is successfully uploaded we visit the upload dir and call it 
 
-![[Pasted image 20260912142117.png]]
+![](../../images/Pasted%20image%2020260912142117.png)
 
 
 # # Whitelist Filters
@@ -94,7 +94,7 @@ if we have tried shell.php.jpg we could have been able to pass the whitelist whi
 If the regex isn't anchored, `shell.png.phtml` passes because it _contains_ `.png`, and Apache runs it because it _ends_ in `.phtml`.
 
 
-![[Pasted image 20260912173057.png]]![[Pasted image 20260912173107.png]]
+![](../../images/Pasted%20image%2020260912173057.png)![](../../images/Pasted%20image%2020260912173107.png)
 
 
 ## Reverse Double Extension## 
@@ -107,11 +107,11 @@ In many cases . the file upload functionality itself may not be vuln but the web
 
 With no `$`, any file _containing_ `.phar`/`.php`/`.phtml` anywhere gets executed. So `shell.php.jpg` passes a strict upload whitelist (ends `.jpg`) **and** executes (contains `.php`).
 
-![[Pasted image 20260912173700.png]]
+![](../../images/Pasted%20image%2020260912173700.png)
 
 FIle was successfully uploaded.
 
-![[Pasted image 20260912173740.png]]
+![](../../images/Pasted%20image%2020260912173740.png)
 
 And we were able to capture the flag...
 
@@ -183,7 +183,7 @@ meaning if .gif is whitelisted, and .phtml is not blacklisted we can use shell.p
 
 Meaning if the server has whitelist and blacklist configs we can bypass it this way using a double extension
 
-![[Pasted image 20260913113755.png]]
+![](../../images/Pasted%20image%2020260913113755.png)
 
 in this example MIME type validation reads the first few bytes of the file (magic bytes/file signature) to determine the actual file type, regardless of extension or Content-Type header. That's why `GIF8` at the start fools it into thinking it's a GIF image.
 
@@ -197,9 +197,9 @@ so the steps where
 
 if the file is uploading but not executing means you are satisfying the whitelisted extension and blacklisted , you need to see what extension can execute php incase there is some configuration on the server it self or the regex script
 
-![[Pasted image 20260913114017.png]]
+![](../../images/Pasted%20image%2020260913114017.png)
 
-![[Pasted image 20260913114419.png]]
+![](../../images/Pasted%20image%2020260913114419.png)
 
 an other example here is that phar and phtml executes the command but if we switch it to .php we get an error because .php here is blacklisted so we only satisfy 2 out of 3 conditions, maybe we could have also tried injecting characters between extensions to bypass or confuse the server in this case this didnt work but its worth trying it 
 
@@ -248,11 +248,11 @@ In SVG files we can include malicious XML data to leak source code or other file
 <svg>&xxe;</svg>
 ```
 
-![[Pasted image 20260913132151.png]]
+![](../../images/Pasted%20image%2020260913132151.png)
 
 here we can see we were able to read the /etc/passwd file and we captured the flag by changing the directory
 
-![[Pasted image 20260913132323.png]]
+![](../../images/Pasted%20image%2020260913132323.png)
 
 We can also use XXE to read source code in PHP web apps by encoding the code into base64 
 
@@ -263,12 +263,12 @@ We can also use XXE to read source code in PHP web apps by encoding the code int
 ```
 
 
-![[Pasted image 20260913132739.png]]
+![](../../images/Pasted%20image%2020260913132739.png)
 
 we succesfullly extracted the encoded php source code of upload.php now we go back to kali and decode it 
 
 
-![[Pasted image 20260913132825.png]]
+![](../../images/Pasted%20image%2020260913132825.png)
 
 as we can see we found very usefull infomation here. 
 
@@ -356,13 +356,13 @@ XSS = client-side attack. XXE = server-side attack.
 
 In this lab i saw there was a checkfile() function so the easiest thing to do was to delete it from the browser and see if my upload would bypass the filter and it did not 
 
-![[Pasted image 20260914092838.png]]
+![](../../images/Pasted%20image%2020260914092838.png)
 
-![[Pasted image 20260914092920.png]]
+![](../../images/Pasted%20image%2020260914092920.png)
 
 I captured the post request with burp tried some quick manual stuff dint  work then i wanted to see what extensions are blacklisted 
 
-![[Pasted image 20260914093401.png]]
+![](../../images/Pasted%20image%2020260914093401.png)
 
 so we can use
 - .pht
@@ -380,20 +380,20 @@ and its whitelisted for
 
 Now we want to see since the server is asking for a image file what kinda content is allowed 
 
-![[Pasted image 20260914164802.png]]
+![](../../images/Pasted%20image%2020260914164802.png)
 
 We can see that image/svg+xml is allowed so we automatically think we can ABUSE this with a XEE attack and try to read some local files , source code , 
 
 Here we tried to a XEE payload , since we the content check was asking for image, image/svg was acceptable , svg was a whitelisted extension so we could pull files and read them , also before this even if we had successfully uploaded the file we didnt know where it went , this was a essential part 
 *reason it detected the code without changing the content type is because of the xml signature or the file*
-![[Pasted image 20260914161906.png]]
+![](../../images/Pasted%20image%2020260914161906.png)
 
 Here we used a php wrapper to get the source code of upload.php in base64 
-![[Pasted image 20260914162020.png]]
+![](../../images/Pasted%20image%2020260914162020.png)
 
 Decoded it back to our KALI
 
-![[Pasted image 20260914162110.png]]
+![](../../images/Pasted%20image%2020260914162110.png)
 
 From the source code above of upload.php, we can clearly see how the website is working!
 
@@ -405,11 +405,11 @@ Type check: /image\/[a-z]{2,3}g/  ,both Content-Type header AND magic-byte MIME 
 
 so shortly here we needed a extension that is not php,phps,phtml, a extension that ends with 2-3 letters ending with g , and the same with the content check , GIF for exmaple here wouldnt work so the GIF8 trick was useless it still needed to be 2-3 letters ending with g and also something that would execute the php code 
 
-![[Pasted image 20260914161646.png]]
+![](../../images/Pasted%20image%2020260914161646.png)
 
-![[Pasted image 20260914161749.png]]
+![](../../images/Pasted%20image%2020260914161749.png)
 
-![[Pasted image 20260914161704.png]]
+![](../../images/Pasted%20image%2020260914161704.png)
 
 The apache confing was poorly configured , **FIlesMatch ".+\.ph(ar|p|tml)"** was not properly anchored, it needed the $at the end so it only matches the final extension, not everywhere in the name thats how we got code execution here image.phar.jpeg , phar was sitting in the middle meaning it could be executed
 
@@ -434,30 +434,30 @@ LAB 2
 
 Here the default upload directory couldn't exexute php code the file was returning plain text  and the filename parameter was vulnerable to path traversal so it was including user input so we jumped a ../ back so going from /files/avatars/test.php to files/test.php, we also had to encode the ../ as it was using some sanitation 
 
-![[Pasted image 20260914213720.png]]
+![](../../images/Pasted%20image%2020260914213720.png)
 
 end of lab 
-![[Pasted image 20260914213747.png]]
+![](../../images/Pasted%20image%2020260914213747.png)
 
 
 # LAB3
 
 In this lab we weere able to upload test.php by obfuscating the extension name 
 
-![[Pasted image 20260915100949.png]]
+![](../../images/Pasted%20image%2020260915100949.png)
 
 
 ## other techniques 
 
-![[Pasted image 20260915101017.png]]
+![](../../images/Pasted%20image%2020260915101017.png)
 
-![[Pasted image 20260915101041.png]]
+![](../../images/Pasted%20image%2020260915101041.png)
 
 
 LAB4
 
 Here we were able to embed malicious code inside the jpg with a tool called exiftool
 
-![[Pasted image 20260915103021.png]]
+![](../../images/Pasted%20image%2020260915103021.png)
 
 this passed the upload filter and was able to execute our php code because the server was validating based on content type here we had image metadata 

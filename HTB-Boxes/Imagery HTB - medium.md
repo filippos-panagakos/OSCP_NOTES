@@ -27,7 +27,7 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
 Found a uploader
 
-![[Pasted image 20261012153957.png]]
+![](../images/Pasted%20image%2020261012153957.png)
 
 after reviewing a bit the source code found this 
 
@@ -40,6 +40,6 @@ after reviewing a bit the source code found this
 ../../../../home/web/web/db.json
 ```
 
-![[Pasted image 20261013104514.png]]
+![](../images/Pasted%20image%2020261013104514.png)
 
 

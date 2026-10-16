@@ -6,18 +6,18 @@ for example
 
 a site is executing a ping command if the validation is happening only on the front end then it means we can manipulate that input and try to append our own commands , in this case wit with the usage of the semicolon we were able to escape and append our own command at the end 
 
-![[Pasted image 20260915120849.png]]
+![](../../images/Pasted%20image%2020260915120849.png)
 
 We can use this as reference to try various techniques to append our command 
 
 
-![[Pasted image 20260915120946.png]]
+![](../../images/Pasted%20image%2020260915120946.png)
 
 # AND Operator
 
 Here we encoded the and operator and our chained command worked
 
-![[Pasted image 20260915121357.png]]
+![](../../images/Pasted%20image%2020260915121357.png)
 
 # OR Operator
 
@@ -26,20 +26,20 @@ Here we encoded the and operator and our chained command worked
 
 If we try to break the first command for instance remove the ip number the OR condition will get executed since the first one failed and will have our command executed
 
-![[Pasted image 20260915122616.png]]
+![](../../images/Pasted%20image%2020260915122616.png)
 
 
 A list below with the most common operators 
 
-![[Pasted image 20260915123122.png]]
+![](../../images/Pasted%20image%2020260915123122.png)
 
 Piping it only show the output of our command 
 
-![[Pasted image 20260915123927.png]]
+![](../../images/Pasted%20image%2020260915123927.png)
 
 In some cases some characters , spaces or commands might be behind a filter its good to try encoding the spaces or special characters 
 
-![[Pasted image 20260915130712.png]]
+![](../../images/Pasted%20image%2020260915130712.png)
 
 
 # Bypassing spaces
@@ -51,14 +51,14 @@ Once we have a working injection operator  for ex `0a whoami`, here we still get
 
 We successfully bypassed the space filter using a tab
 
-![[Pasted image 20260915135633.png]]
+![](../../images/Pasted%20image%2020260915135633.png)
 
 We successfully bypassed the space filter using $IFS
 
-![[Pasted image 20260915135305.png]]
+![](../../images/Pasted%20image%2020260915135305.png)
 
 We successfully bypassed the space filter using bash brace expansion
-![[Pasted image 20260915135451.png]]
+![](../../images/Pasted%20image%2020260915135451.png)
 
 To discover more space filter bypasses, check out the [PayloadsAllTheThings](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Command%20Injection#bypass-without-space) page on writing commands without spaces
 
@@ -70,7 +70,7 @@ Besides injection operators and space characters, a very commonly blacklisted ch
 
 We can use environment variables like we did with ${IFS} , IFS only replaces spaces , a way to produce slashes and semicolons is by specifying a **start** and **length** of our string to exactly match this character , for example
 
-![[Pasted image 20260915141352.png]]
+![](../../images/Pasted%20image%2020260915141352.png)
 
 if we start at the 0 character only take a string of length 1 , we will end up with only the / character which we can then use to our payload
 
@@ -90,11 +90,11 @@ echo ${LS_COLORS:10:1}
 
 From the printenv command , we found that **COLORFGBG=15;0**  has a semicolon which we can use , so by doing 
 
-![[Pasted image 20260915142629.png]]
+![](../../images/Pasted%20image%2020260915142629.png)
 
 here our starting poiont will be 2 and our length will be 1 as we only need one character so the final result will be 
 
-![[Pasted image 20260915142715.png]]
+![](../../images/Pasted%20image%2020260915142715.png)
 
 so `echo ${COLORFGBG:2:1}` produces a semicolon
 
@@ -142,7 +142,7 @@ dominuc07@htb[/htb]$ echo $(tr '!-}' '"-~'<<<[)
 
 the math works by pushing every character up one possition so if we want to produce the semicolon here 
 
-![[Pasted image 20260915145248.png]]
+![](../../images/Pasted%20image%2020260915145248.png)
 
 we need to go back one possition , so the previous character before the ; is the : so the command should follow as 
 
@@ -160,7 +160,7 @@ here we combined various techniques we found a working injection was the encoded
 
 
 
-![[Pasted image 20260915152650.png]]
+![](../../images/Pasted%20image%2020260915152650.png)
 
 # Bypassing Blacklisted Commands
 
@@ -177,7 +177,7 @@ The easiest to use are quotes, and they work on both Linux and Windows servers. 
 w"h"o"am"i
 ```
 
-![[Pasted image 20260915153812.png]]
+![](../../images/Pasted%20image%2020260915153812.png)
 
 
 > [!NOTE]
@@ -202,11 +202,11 @@ who^ami
 
 LAB , in this like we will try to find the flag in the previous username 
 
-![[Pasted image 20260915154609.png]]
+![](../../images/Pasted%20image%2020260915154609.png)
 
 essentially this is the command we try to inject and it translates to 
 
-![[Pasted image 20260915154657.png]]
+![](../../images/Pasted%20image%2020260915154657.png)
 
 `ip=127.0.0.1%0ac'a't${IFS}${PWD:0:1}home${PWD:0:1}1nj3c70r${PWD:0:1}flag.txt`
 
@@ -236,7 +236,7 @@ $(tr "[A-Z]" "[a-z]"<<<"WhOaMi")
 
 tr here replaced all uper-case charachters with lower -case characters . which results in all lower-case character command.  This command tho might still fail if the application filters spaces or any other filtered characthers, if we replace the spaces with tabs `%09` the command executes perfectly! 
 
-![[Pasted image 20260915155413.png]]
+![](../../images/Pasted%20image%2020260915155413.png)
 
 On other way is to reverse the word for ex
 
@@ -281,21 +281,21 @@ bash<<<$(base64 -d<<<Y2F0IC9ldGMvcGFzc3dkIHwgZ3JlcCAzMw==)
 ```
 
 
-![[Pasted image 20260915160310.png]]
+![](../../images/Pasted%20image%2020260915160310.png)
 
 > [!NOTE]
 > Tip: Note that we are using `<<<` to avoid using a pipe `|`, which is a filtered character.
 
-![[Pasted image 20260915160349.png]]
+![](../../images/Pasted%20image%2020260915160349.png)
 
 
 ## LAB3
 
-![[Pasted image 20260915190508.png]]
+![](../../images/Pasted%20image%2020260915190508.png)
 
 in this lab we base64 encoded the entire command with the restricted charachters in it we also used <<< because | pas restricted , in this example bash was not restricted but if it was this could have also worked 
 
-![[Pasted image 20260915190724.png]]
+![](../../images/Pasted%20image%2020260915190724.png)
 
 b$()ash also we covered the space using tabs 
 
@@ -304,17 +304,17 @@ b$()ash also we covered the space using tabs
 
 A handy tool we can utilize for obfuscating bash commands is [Bashfuscator](https://github.com/Bashfuscator/Bashfuscator). We can clone the repository from GitHub and then install its requirements, as follows:
 
-![[Pasted image 20260916091646.png]]
+![](../../images/Pasted%20image%2020260916091646.png)
 
 we can start using it from the `./bashfuscator/bin/` directory.
 
-![[Pasted image 20260916091725.png]]
+![](../../images/Pasted%20image%2020260916091725.png)
 
 
 
 ## Windows (DOSfuscation)
 
-![[Pasted image 20260916091804.png]]
+![](../../images/Pasted%20image%2020260916091804.png)
 
 
 Final Assesement 
@@ -324,7 +324,7 @@ Here spaces were filtered as well as command , I first tried to find my injector
 
 GET /index.php?to=tmp%26c'a't${IFS}${PWD:0:1}flag.txt&from=2380029473.txt&finish=1&move=1
 
-![[Pasted image 20260916120418.png]]
+![](../../images/Pasted%20image%2020260916120418.png)
 
 
 other way is to encode the entire command to a base64 string to bypass filters tap the spaces with %09 

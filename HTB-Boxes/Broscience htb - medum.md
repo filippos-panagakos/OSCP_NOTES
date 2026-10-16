@@ -55,21 +55,21 @@ Nothing interesting here!
 Interesting 
 we found the admin email
 
-![[Pasted image 20261014100957.png]]
+![](../images/Pasted%20image%2020261014100957.png)
 
 
 error while tryn to login in 
 
-![[Pasted image 20261014101134.png]]
+![](../images/Pasted%20image%2020261014101134.png)
 
 userenmueration allowed
 
-![[Pasted image 20261014101221.png]]
+![](../images/Pasted%20image%2020261014101221.png)
 
 LFI?
 
 
-![[Pasted image 20261014103506.png]]
+![](../images/Pasted%20image%2020261014103506.png)
 
 
 THIS MOTHERFUCKER needed a double url encoding to work ;)
@@ -161,12 +161,12 @@ _laurel:x:998:998::/var/log/laurel:/bin/false
 
 
 
-![[Pasted image 20261014104746.png]]
+![](../images/Pasted%20image%2020261014104746.png)
 
 viewing the vhost conf file
 
 
-![[Pasted image 20261014110306.png]]
+![](../images/Pasted%20image%2020261014110306.png)
 
 found the php version 
 
@@ -176,7 +176,7 @@ found the php version
 
 
 
-![[Pasted image 20261014112130.png]]
+![](../images/Pasted%20image%2020261014112130.png)
 ```
 
 allow_url_include = Off
@@ -186,7 +186,7 @@ disable_functions = pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexi
 
 
 
-![[Pasted image 20261014114158.png]]
+![](../images/Pasted%20image%2020261014114158.png)
 
 found credentials for the db
 
@@ -210,7 +210,7 @@ if (!$db_conn) {
 
 
 
-![[Pasted image 20261014174338.png]]
+![](../images/Pasted%20image%2020261014174338.png)
 
 
 # Vuln 2: Insecure deserialization (RCE)
@@ -229,7 +229,7 @@ class AvatarInterface {
 
 `__wakeup()` fires automatically on `unserialize()` — attacker controls `$tmp` (fetch URL) and `$imgPath` (write destination).
 
-![[Pasted image 20261014174404.png]]
+![](../images/Pasted%20image%2020261014174404.png)
 
 # Account Activation — PRNG Attack
 
@@ -388,4 +388,4 @@ tcp   LISTEN 0      511                *:443              *:*
 
 these hashes were salted, we needed to specifiy where the salt was placed it order for hashcat or john to crack it
 
-![[Pasted image 20261014195149.png]]
+![](../images/Pasted%20image%2020261014195149.png)

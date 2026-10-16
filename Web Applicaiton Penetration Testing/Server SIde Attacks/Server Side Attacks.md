@@ -21,10 +21,10 @@ Here we enumerated internal running services and as we can see we found 3
 
 
 
-![[Pasted image 20260919195057.png]]
+![](../../images/Pasted%20image%2020260919195057.png)
 
 
-![[Pasted image 20260919194919.png]]
+![](../../images/Pasted%20image%2020260919194919.png)
 
 
 ## Accessing Restricted Endpoints
@@ -32,7 +32,7 @@ Here we enumerated internal running services and as we can see we found 3
 We can access and enumerate the domain through the SSRF vulnerability. For instance, we can conduct a directory brute-force attack to enumerate additional endpoints using `ffuf`. To do so, let us first determine the web server's response when we access a non-existent page:
 
 
-![[Pasted image 20260919201611.png]]
+![](../../images/Pasted%20image%2020260919201611.png)
 
 
 As we can see, the web server responds with the default Apache 404 response. To also filter out any HTTP 403 responses, we will filter our results based on the string `Server at dateserver.htb Port 80`, which is contained in the default Apache error pages. Since the web application runs PHP, we will specify the `.php` extension:
@@ -42,7 +42,7 @@ ffuf -w /opt/SecLists/Discovery/Web-Content/raft-small-words.txt -u http://172.1
 ```
 
 
-![[Pasted image 20260919201941.png]]
+![](../../images/Pasted%20image%2020260919201941.png)
 
 we found 2 internal pages , admin and availability 
 
@@ -51,7 +51,7 @@ we found 2 internal pages , admin and availability
 
 As seen a few sections ago, we can manipulate the URL scheme to provoke further unexpected behavior. Since the URL scheme is part of the URL supplied to the web application, let us attempt to read local files from the file system using the `file://` URL scheme. We can achieve this by supplying the URL `file:///etc/passwd`.
 
-![[Pasted image 20260919202212.png]]
+![](../../images/Pasted%20image%2020260919202212.png)
 
 
 ## The gopher Protocol
@@ -59,7 +59,7 @@ As seen a few sections ago, we can manipulate the URL scheme to provoke further 
 
 As we have seen previously, we can use SSRF to access restricted internal endpoints. However, we are restricted to GET requests as there is no way to send a POST request with the `http://` URL scheme. For instance, let us consider a different version of the previous web application. Assuming we identified the internal endpoint `/admin.php` just like before, however, this time the response looks like this:
 
-![[Pasted image 20260919202406.png]]
+![](../../images/Pasted%20image%2020260919202406.png)
 
 Assuming we want to try common weak passwords, such as `admin`, we can send the following POST request:
 
@@ -92,7 +92,7 @@ Content-Type: application/x-www-form-urlencoded
 dateserver=gopher%3a//dateserver.htb%3a80/_POST%2520/admin.php%2520HTTP%252F1.1%250D%250AHost%3a%2520dateserver.htb%250D%250AContent-Length%3a%252013%250D%250AContent-Type%3a%2520application/x-www-form-urlencoded%250D%250A%250D%250Aadminpw%253Dadmin&date=2024-01-01
 ```
 
-![[Pasted image 20260919202957.png]]
+![](../../images/Pasted%20image%2020260919202957.png)
 
 
 
@@ -214,7 +214,7 @@ Decode twice → should look like the raw HTTP request:
 `POST /admin.php HTTP/1.1\r\nHost: 10.129.201.127\r\n...`
 
 If after one decode you still see `%25` anywhere → you encoded too many times. If after two decodes you still see `%20` → you didn't encode enough.
-![[Pasted image 20260919205519.png]]
+![](../../images/Pasted%20image%2020260919205519.png)
 
 
 
@@ -244,7 +244,7 @@ However, if we attempt to point the web application to itself, we can observe th
 
 
 
-![[Pasted image 20260919205909.png]]
+![](../../images/Pasted%20image%2020260919205909.png)
 
 
 
@@ -252,31 +252,31 @@ However, if we attempt to point the web application to itself, we can observe th
 
 Exploiting blind SSRF vulnerabilities is generally severely limited compared to non-blind SSRF vulnerabilities. However, depending on the web application's behavior, we might still be able to conduct a (restricted) local port scan of the system, provided the response differs for open and closed ports. In this case, the web application responds with `Something went wrong!` for closed ports:
 
-![[Pasted image 20260919210031.png]]
+![](../../images/Pasted%20image%2020260919210031.png)
 
 However, if a port is open and responds with a valid HTTP response, we get a different error message:
 
-![[Pasted image 20260919210038.png]]
+![](../../images/Pasted%20image%2020260919210038.png)
 
 Depending on how the web application catches unexpected errors, we might be unable to identify running services that do not respond with valid HTTP responses. For instance, we are unable to identify the running MySQL service using this technique:
 
-![[Pasted image 20260919210122.png]]
+![](../../images/Pasted%20image%2020260919210122.png)
 
 
 Furthermore, although we cannot read local files as before, we can still use the same technique to identify existing files on the filesystem. That is because the error message is different for existing and non-existing files, just like it differs for open and closed ports
 
 
-![[Pasted image 20260919210208.png]]
+![](../../images/Pasted%20image%2020260919210208.png)
 
 For invalid files, the error message is different:
 
-![[Pasted image 20260919210224.png]]
+![](../../images/Pasted%20image%2020260919210224.png)
 
 
 While we cannot use blind SSRF vulnerabilities to directly exfiltrate data, as we did in the previous sections, we can employ the discussed techniques to enumerate open ports in the local network or enumerate existing files on the filesystem. This may reveal information about the underlying system architecture that can help prepare subsequent attacks. Keep in mind that even if the web application responds with the same error message for both open and closed ports, we can still interact with the internal network, albeit blindly. Therefore, we can potentially exploit internal web applications by guessing common payloads.
 
 
-![[Pasted image 20260919212127.png]]
+![](../../images/Pasted%20image%2020260919212127.png)
 
 here the server was giving blind responses , meaning there was a different reaction of  on a closed and open port , closed ports were giving "something went wrong! " errors so we excluded them from our FUZZ and found the open ports 
 
@@ -304,14 +304,14 @@ SSTI can occur when user input is inserted into the template **before** the rend
 To successfully exploit an SSTI vulnerability, we first need to determine the template engine used by the web application. We can utilize slight variations in the behavior of different template engines to achieve this. For instance, consider the following commonly used overview containing slight differences in popular template engines:
 
 
-![[Pasted image 20260920092341.png]]
+![](../../images/Pasted%20image%2020260920092341.png)
 
 
 Lab
 
 Here we had to identify the template engine , by following the above diagram we injected various payloads, the `{{7*'7'}}` seemed to work and produced the result 49 which means its a Twig template 
 
-![[Pasted image 20260920093034.png]]
+![](../../images/Pasted%20image%2020260920093034.png)
 
 
 # Exploiting SSTI - Jinja2
@@ -330,7 +330,7 @@ we can obtain the web application's configuration using the following SSTI paylo
 ```
 
 
-![[Pasted image 20260920093533.png]]
+![](../../images/Pasted%20image%2020260920093533.png)
 
 
 We can use the following SSTI payload to dump all available built-in functions:
@@ -349,7 +349,7 @@ We can use Python's built-in function `open` to include a local file. However, w
 ```
 
 
-![[Pasted image 20260920093825.png]]
+![](../../images/Pasted%20image%2020260920093825.png)
 
 
 ## Remote Code Execution (RCE)
@@ -361,16 +361,16 @@ To achieve remote code execution in Python, we can use functions provided by the
 {{ self.__init__.__globals__.__builtins__.__import__('os').popen('id').read() }}
 ```
 
-![[Pasted image 20260920093942.png]]
+![](../../images/Pasted%20image%2020260920093942.png)
 
 
 Exercise! 
 
 We used command execution to obtain the flag
 
-![[Pasted image 20260920094146.png]]
+![](../../images/Pasted%20image%2020260920094146.png)
 
-![[Pasted image 20260920094201.png]]
+![](../../images/Pasted%20image%2020260920094201.png)
 
 
 # Exploiting SSTI - Twig
@@ -384,7 +384,7 @@ In Twig, we can use the `_self` keyword to obtain a little information about the
 {{ _self }}
 ```
 
-![[Pasted image 20260920094432.png]]
+![](../../images/Pasted%20image%2020260920094432.png)
 
 
 ## Local File Inclusion (LFI)
@@ -485,12 +485,12 @@ sstimap.py -u "http://target/?name=*" -e freemarker
 `# Bind shell (target opens port)`
 `--bind-shell <port>`
 
-![[Pasted image 20260920102525.png]]
+![](../../images/Pasted%20image%2020260920102525.png)
 
 
-![[Pasted image 20260920102509.png]]
+![](../../images/Pasted%20image%2020260920102509.png)
 
-![[Pasted image 20260920102452.png]]
+![](../../images/Pasted%20image%2020260920102452.png)
 
 ## Interactive Mode
 
@@ -609,14 +609,14 @@ Common `echo` vars: `DOCUMENT_NAME`, `DOCUMENT_URI`, `LAST_MODIFIED`, `DATE_LOCA
 
 If we enter our name, we are redirected to `/page.shtml`, which displays some general information:
 
-![[Pasted image 20260920104858.png]]
+![](../../images/Pasted%20image%2020260920104858.png)
 
 
 We can guess that the page supports SSI based on the file extension. If our username is inserted into the page without prior sanitization, it might be vulnerable to SSI injection. Let us confirm this by providing a username of `<!--#printenv -->`
 
 we can execute arbitrary commands using the `exec` directive by providing the following username: `<!--#exec cmd="id" -->`
 
-![[Pasted image 20260920105201.png]]
+![](../../images/Pasted%20image%2020260920105201.png)
 
 ------------
 
@@ -733,7 +733,7 @@ As the name suggests, XSLT injection occurs whenever user input is inserted into
 As we can see, the name we provide is reflected on the page. Suppose the web application stores the module information in an XML document and displays the data using XSLT processing. In that case, it might be vulnerable to XSLT injection if our name is inserted without sanitization before XSLT processing. To confirm this, let us try injecting a broken XML tag to provoke an error in the web application. We can achieve this by providing the username `<`
 
 
-![[Pasted image 20260920111305.png]]
+![](../../images/Pasted%20image%2020260920111305.png)
 
 
 ## Information Disclosure
@@ -754,7 +754,7 @@ Product Version: <xsl:value-of select="system-property('xsl:product-version')" /
 ```
 
 
-![[Pasted image 20260920111658.png]]
+![](../../images/Pasted%20image%2020260920111658.png)
 
 
 Since the web application interpreted the XSLT elements we provided, this confirms an XSLT injection vulnerability. Furthermore, we can deduce that the web application seems to rely on the `libxslt` library and supports XSLT version `1.0`
@@ -775,7 +775,7 @@ However, it was only introduced in XSLT version 2.0. Thus, our sample web applic
 
 Our sample web application is configured to support PHP functions. As such, the local file is displayed in the response:
 
-![[Pasted image 20260920112120.png]]
+![](../../images/Pasted%20image%2020260920112120.png)
 
 
 
@@ -1032,14 +1032,14 @@ In all four, the root cause is the same: user input reaches a server-side interp
 
 From looking at the site i couldn't identify anything, i looked at the source code, enumerated a bit saw nothing interesting, then i launched burp browser and started using the in built browser to collect some requests
 
-![[Pasted image 20260920120427.png]]
+![](../../images/Pasted%20image%2020260920120427.png)
 
 
 From here , i can immediately tell that this site might be vuln to SSRF, there is a POST request can a api calling to a external website truck.api.htb to retrieve the ids of the trucks, since i am not in the same network making the webserver connect to me wont work so i tried to make it talk to it self to , from that i got a successful response
 
 My second though was that there might be some internal endpoints so i tried using 127.0.01:80 to see how the server reacts , i didnt get a error , tried again port 81 and got 
 
-![[Pasted image 20260920120718.png]]
+![](../../images/Pasted%20image%2020260920120718.png)
 
 from there i got my confirmation that there are internal endpoints so i launched fuff to fuzz the ports and see what else is there 
 
@@ -1054,7 +1054,7 @@ As we can see fuff found 2 services running
 
 3306 is a Microsoft server
 
-![[Pasted image 20260920120801.png]]
+![](../../images/Pasted%20image%2020260920120801.png)
 
 The setup
 The target web app had an SSRF in the `api` parameter. The app fetched whatever URL you gave it via libcurl. During internal enumeration, a hidden service was discovered on `truckapi.htb` — an internal API that returned JSON based on an `id` parameter.

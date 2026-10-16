@@ -1,5 +1,5 @@
 enumerating GraphQL
-![[Pasted image 20261005115804.png]]
+![](../../images/Pasted%20image%2020261005115804.png)
 
 
 ## Introspection
@@ -22,7 +22,7 @@ For instance, we can identify all GraphQL types supported by the backend using t
 
 The results contain basic default types, such as `Int` or `Boolean`, but also all custom types, such as `UserObject`
 
-![[Pasted image 20261005120615.png]]
+![](../../images/Pasted%20image%2020261005120615.png)
 
 
 Now that we know a type, we can follow up and obtain the name of all of the type's fields with the following introspection query:
@@ -46,7 +46,7 @@ Now that we know a type, we can follow up and obtain the name of all of the type
 
 In the result, we can see details we would expect from a user object, such as `username` and `password`, as well as their data types
 
-![[Pasted image 20261005120637.png]]
+![](../../images/Pasted%20image%2020261005120637.png)
 
 
 Furthermore, we can obtain all the queries supported by the backend using this query:
@@ -170,10 +170,10 @@ The result of this query is quite large and complex. However, we can visualize t
 In the demo, we can click `CHANGE SCHEMA` and select `INTROSPECTION`. After pasting the result of the above introspection query in the text field and clicking on `DISPLAY`, the backend's GraphQL schema is visualized for us. We can explore all supported queries, types, and fields:
 
 
-![[Pasted image 20261005121704.png]]
+![](../../images/Pasted%20image%2020261005121704.png)
 
 
-![[Pasted image 20261005121713.png]]
+![](../../images/Pasted%20image%2020261005121713.png)
 
 
 
@@ -188,7 +188,7 @@ Like REST APIs, broken authorization, particularly Insecure Direct Object Refere
 To identify issues related to broken authorization, we first need to identify potential attack points that would enable us to access data we are not authorized to access. Enumerating the web application, we can observe that the following GraphQL query is sent when we access our user profile
 
 
-![[Pasted image 20261005171322.png]]
+![](../../images/Pasted%20image%2020261005171322.png)
 
 
 ## Exploiting IDOR
@@ -213,7 +213,7 @@ To demonstrate the impact of this IDOR vulnerability, we need to identify the da
 ```
 
 
-![[Pasted image 20261005171454.png]]
+![](../../images/Pasted%20image%2020261005171454.png)
 
 
 Let us adjust the initial GraphQL query to check if we can exploit the IDOR vulnerability to obtain another user's password by adding the `password` field in the GraphQL query
@@ -232,7 +232,7 @@ Let us adjust the initial GraphQL query to check if we can exploit the IDOR vuln
 
 From the result, we can see that we have successfully obtained the user's password:
 
-![[Pasted image 20261005171539.png]]
+![](../../images/Pasted%20image%2020261005171539.png)
 
 
 # Injection Attacks
@@ -247,24 +247,24 @@ One of the most common web vulnerabilities are injection attacks such as [SQL In
 To identify if a query requires an argument, we can send the query without any arguments and analyze the response. If the backend expects an argument, the response contains an error that tells us the name of the required argument. For instance, the following error message tells us that the `postByAuthor` query requires the `author` argument:
 
 
-![[Pasted image 20261005172655.png]]
+![](../../images/Pasted%20image%2020261005172655.png)
 
 After supplying the `author` argument, the query is executed successfully:
 
 
-![[Pasted image 20261005172702.png]]
+![](../../images/Pasted%20image%2020261005172702.png)
 
 
 Let us move on to the `user` query. If we try the same payload there, the query still returns the previous result, indicating a SQL injection vulnerability
 
 
-![[Pasted image 20261005172820.png]]
+![](../../images/Pasted%20image%2020261005172820.png)
 
 
 If we simply inject a single quote, the response contains a SQL error, confirming the vulnerability
 
 
-![[Pasted image 20261005172843.png]]
+![](../../images/Pasted%20image%2020261005172843.png)
 
 
 
@@ -274,7 +274,7 @@ Since the SQL query is displayed in the SQL error, we can construct a UNION-base
 To construct a UNION-based SQL injection payload, let us take another look at the results of the introspection query:
 
 
-![[Pasted image 20261005173235.png]]
+![](../../images/Pasted%20image%2020261005173235.png)
 
 
 
@@ -316,12 +316,12 @@ Since this is a SQL injection vulnerability, similar to any other web applicatio
 
 XSS vulnerabilities can occur if GraphQL responses are inserted into the HTML page without proper sanitization. Similar to the above SQL injection vulnerability, we should investigate any GraphQL arguments for potential XSS injection points. However, in this case, neither queries return an XSS payload:
 
-![[Pasted image 20261005173348.png]]
+![](../../images/Pasted%20image%2020261005173348.png)
 
 
 XSS vulnerabilities can also occur if invalid arguments are reflected in error messages. Let us examine the `post` query, which requires an integer ID as an argument. If we instead submit a string argument containing an XSS payload, we can see that the XSS payload is reflected without proper encoding in the GraphQL error message
 
-![[Pasted image 20261005173428.png]]
+![](../../images/Pasted%20image%2020261005173428.png)
 
 
 However, if we attempt to trigger the URL from the corresponding GET parameter by accessing the URL `/post?id=<script>alert(1)</script>`, we can observe that the page simply breaks, and the XSS payload is not triggered.
