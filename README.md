@@ -10,7 +10,7 @@ Personal notes, methodologies, and writeups built while preparing for the OSCP c
 
 ## About
 
-These notes are part of my hands-on learning journey toward becoming a penetration tester. Each writeup documents the thought process, mistakes, and techniques used — not just the final solution.
+These notes are part of my hands-on learning journey toward becoming a penetration tester. Each writeup documents the thought process, mistakes, and techniques used not just the final solution.
 
 Built with Obsidian, pushed to GitHub for version control and sharing.
 
