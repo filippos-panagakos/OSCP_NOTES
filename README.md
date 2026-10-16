@@ -1,20 +1,18 @@
 # OSCP Notes
 
-Cybersecurity enthusiast focused on web application and network penetration testing. Completed HTB's CPTS and CWES learning paths, actively solving HTB machines and PortSwigger labs. Currently working toward OSCP. This repo contains my methodology notes, cheat sheets, and writeups built along the way.
+Personal notes, methodologies, and writeups built while preparing for the OSCP certification.
 
 ## What's Inside
 
-**HTB-Boxes/** — Writeups for HackTheBox machines, covering the full attack chain from enumeration to root.
+**HTB-Machines/** — Writeups for HackTheBox machines, covering the full attack chain from enumeration to root.
 
-**Web Applicaiton Penetration Testing/** — Methodology notes and cheat sheets for SQLi, XSS, LFI, command injection, deserialization, server-side attacks, API attacks, GraphQL, fuzzing, and more.
+**Methodologies/** — Reusable checklists and command references for common attack vectors (coming soon).
 
-**Attacking-Common-Applications/** — Notes on attacking WordPress, Jenkins, Tomcat, Splunk, Joomla, Drupal, GitLab, osTicket, PRTG, ColdFusion, and others.
+## About
 
-**Cracking/** — Password cracking methodology and references.
+These notes are part of my hands-on learning journey toward becoming a penetration tester. Each writeup documents the thought process, mistakes, and techniques used — not just the final solution.
 
-**FIle Transfering/** — File transfer techniques across platforms.
-
-**Miscellaneous/** — Linux/Windows command references and general methodology.
+Built with Obsidian, pushed to GitHub for version control and sharing.
 
 ## Disclaimer
 
