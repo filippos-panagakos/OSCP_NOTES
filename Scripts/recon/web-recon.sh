@@ -13,7 +13,38 @@ YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
+# Default wordlists
+SMALL_WL="/usr/share/wordlists/dirb/common.txt"
+BIG_WL="/usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt"
+VHOST_WL="/usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt"
+
 echo -e "${CYAN}[web-recon] Target: $URL${NC}"
+echo ""
+echo -e "${YELLOW}[?] Use default wordlists or custom?${NC}"
+echo -e "  1) Default (common.txt + medium + seclists vhosts)"
+echo -e "  2) Custom — specify your own path(s)"
+read -rp "  Choice [1]: " WL_CHOICE
+
+if [ "$WL_CHOICE" = "2" ]; then
+    read -rp "  Small/quick wordlist [$SMALL_WL]: " CUSTOM_SMALL
+    [ -n "$CUSTOM_SMALL" ] && SMALL_WL="$CUSTOM_SMALL"
+
+    read -rp "  Big/thorough wordlist [$BIG_WL]: " CUSTOM_BIG
+    [ -n "$CUSTOM_BIG" ] && BIG_WL="$CUSTOM_BIG"
+
+    if [ -n "$DOMAIN" ]; then
+        read -rp "  Vhost wordlist [$VHOST_WL]: " CUSTOM_VHOST
+        [ -n "$CUSTOM_VHOST" ] && VHOST_WL="$CUSTOM_VHOST"
+    fi
+fi
+
+# Validate wordlists exist
+for wl in "$SMALL_WL" "$BIG_WL"; do
+    if [ ! -f "$wl" ]; then
+        echo -e "${YELLOW}[!] Wordlist not found: $wl — skipping that scan${NC}"
+    fi
+done
+echo ""
 
 # Tech detection
 echo -e "${YELLOW}[*] WhatWeb...${NC}"
@@ -28,11 +59,11 @@ curl -sk "$URL/.well-known/security.txt" -o "$OUTDIR/security.txt" 2>/dev/null
 
 # Gobuster — common dirs
 echo -e "${YELLOW}[*] Gobuster (common.txt + extensions)...${NC}"
-gobuster dir -u "$URL" -w /usr/share/wordlists/dirb/common.txt -x php,html,txt,bak,asp,aspx -t 50 -q -o "$OUTDIR/gobuster-common.txt" 2>/dev/null
+[ -f "$SMALL_WL" ] && gobuster dir -u "$URL" -w "$SMALL_WL" -x php,html,txt,bak,asp,aspx -t 50 -q -o "$OUTDIR/gobuster-common.txt" 2>/dev/null
 
-# Gobuster — medium wordlist (background)
-echo -e "${YELLOW}[*] Gobuster (medium, background)...${NC}"
-gobuster dir -u "$URL" -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -t 50 -q -o "$OUTDIR/gobuster-medium.txt" 2>/dev/null &
+# Gobuster — big wordlist (background)
+echo -e "${YELLOW}[*] Gobuster (big wordlist, background)...${NC}"
+[ -f "$BIG_WL" ] && gobuster dir -u "$URL" -w "$BIG_WL" -t 50 -q -o "$OUTDIR/gobuster-medium.txt" 2>/dev/null &
 
 # Nikto
 echo -e "${YELLOW}[*] Nikto (background)...${NC}"
@@ -44,7 +75,7 @@ if [ -n "$DOMAIN" ]; then
     # First get baseline word count
     BASELINE=$(curl -sk -H "Host: nonexistent12345.$DOMAIN" "$URL" | wc -w)
     echo -e "  Baseline word count: $BASELINE"
-    ffuf -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt \
+    ffuf -w "$VHOST_WL" \
         -u "$URL" -H "Host: FUZZ.$DOMAIN" -ic -fw "$BASELINE" \
         -o "$OUTDIR/vhosts.json" 2>/dev/null | tee "$OUTDIR/vhosts.txt"
 fi
